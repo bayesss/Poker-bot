@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameSimulators\BaseGameSimulator.cs" />
-    <Compile Include="GameSimulators\BluffasaurusVsBluffasaurusNormal.cs" />
+    <Compile Include="GameSimulators\BluffasaurusVsAllInPlayer.cs" />
     <Compile Include="GameSimulators\GameSimulationResult.cs" />
     <Compile Include="GameSimulators\IGameSimulator.cs" />
     <Compile Include="Program.cs" />
@@ -58,13 +58,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\AI\TexasHoldem.AI.BluffasaurusLame\TexasHoldem.AI.BluffasaurusLame.csproj">
-      <Project>{0869294e-7692-40ab-adda-6fcf2a91532c}</Project>
-      <Name>TexasHoldem.AI.BluffasaurusLame</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\AI\TexasHoldem.AI.Bluffasaurus\TexasHoldem.AI.Bluffasaurus.csproj">
       <Project>{2dc4c6a0-3f09-4cbe-aaa2-76c6b7b08081}</Project>
       <Name>TexasHoldem.AI.Bluffasaurus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\TexasHoldem.AI.AllInPlayer\TexasHoldem.AI.AllInPlayer.csproj">
+      <Project>{ea287442-8932-4ced-813d-b232b99cf17b}</Project>
+      <Name>TexasHoldem.AI.AllInPlayer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

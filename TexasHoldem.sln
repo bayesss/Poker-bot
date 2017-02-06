@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AI", "AI", "{4E13E89E-6B5B-4B32-8E30-612389BEE478}"
 EndProject
@@ -11,11 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameSimulations", "GameSimu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.GameSimulations", "GameSimulations\TexasHoldem.GameSimulations\TexasHoldem.GameSimulations.csproj", "{FD947574-F557-4EF3-A6F6-5113355291B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.AI.BluffasaurusLame", "AI\TexasHoldem.AI.BluffasaurusLame\TexasHoldem.AI.BluffasaurusLame.csproj", "{0869294E-7692-40AB-ADDA-6FCF2A91532C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{E9DCDD84-5C80-4930-B655-DF19BB05226A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.UI.Console", "UI\TexasHoldem.UI.Console\TexasHoldem.UI.Console.csproj", "{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.AI.AllInPlayer", "TexasHoldem.AI.AllInPlayer\TexasHoldem.AI.AllInPlayer.csproj", "{EA287442-8932-4CED-813D-B232B99CF17B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +31,14 @@ Global
 		{FD947574-F557-4EF3-A6F6-5113355291B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD947574-F557-4EF3-A6F6-5113355291B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD947574-F557-4EF3-A6F6-5113355291B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0869294E-7692-40AB-ADDA-6FCF2A91532C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0869294E-7692-40AB-ADDA-6FCF2A91532C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0869294E-7692-40AB-ADDA-6FCF2A91532C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0869294E-7692-40AB-ADDA-6FCF2A91532C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA287442-8932-4CED-813D-B232B99CF17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA287442-8932-4CED-813D-B232B99CF17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA287442-8932-4CED-813D-B232B99CF17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA287442-8932-4CED-813D-B232B99CF17B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,7 +46,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2DC4C6A0-3F09-4CBE-AAA2-76C6B7B08081} = {4E13E89E-6B5B-4B32-8E30-612389BEE478}
 		{FD947574-F557-4EF3-A6F6-5113355291B4} = {1C7A5B33-95E6-435D-A9A2-3836456FA9F4}
-		{0869294E-7692-40AB-ADDA-6FCF2A91532C} = {4E13E89E-6B5B-4B32-8E30-612389BEE478}
 		{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25} = {E9DCDD84-5C80-4930-B655-DF19BB05226A}
+		{EA287442-8932-4CED-813D-B232B99CF17B} = {4E13E89E-6B5B-4B32-8E30-612389BEE478}
 	EndGlobalSection
 EndGlobal
