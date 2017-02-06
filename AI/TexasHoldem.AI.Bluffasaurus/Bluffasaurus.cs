@@ -487,18 +487,5 @@
 
             return 0;
         }
-
-        private bool IsPairHighestPossible(int pairType)
-        {
-            for (int i = 0; i < this.CommunityCards.Count; i++)
-            {
-                if ((int)this.CommunityCards.ElementAt(i).Type > pairType)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
     }
 }
