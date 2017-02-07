@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.UI.Console", "U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.AI.AllInPlayer", "TexasHoldem.AI.AllInPlayer\TexasHoldem.AI.AllInPlayer.csproj", "{EA287442-8932-4CED-813D-B232B99CF17B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TexasHoldem.AI.RandomPlayer", "TexasHoldem.AI.RandomPlayer\TexasHoldem.AI.RandomPlayer.csproj", "{957155C7-4430-4F6F-B1A7-AAE63189F972}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{EA287442-8932-4CED-813D-B232B99CF17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA287442-8932-4CED-813D-B232B99CF17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA287442-8932-4CED-813D-B232B99CF17B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957155C7-4430-4F6F-B1A7-AAE63189F972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957155C7-4430-4F6F-B1A7-AAE63189F972}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957155C7-4430-4F6F-B1A7-AAE63189F972}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957155C7-4430-4F6F-B1A7-AAE63189F972}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,5 +54,6 @@ Global
 		{FD947574-F557-4EF3-A6F6-5113355291B4} = {1C7A5B33-95E6-435D-A9A2-3836456FA9F4}
 		{58D705BF-8F7E-4555-ADE2-5FFD4A2A4C25} = {E9DCDD84-5C80-4930-B655-DF19BB05226A}
 		{EA287442-8932-4CED-813D-B232B99CF17B} = {4E13E89E-6B5B-4B32-8E30-612389BEE478}
+		{957155C7-4430-4F6F-B1A7-AAE63189F972} = {4E13E89E-6B5B-4B32-8E30-612389BEE478}
 	EndGlobalSection
 EndGlobal

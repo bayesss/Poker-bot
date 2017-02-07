@@ -1,5 +1,4 @@
-﻿using System;
-using TexasHoldem.Logic.Players;
+﻿using TexasHoldem.Logic.Players;
 
 namespace TexasHoldem.AI.AllInPlayer
 {

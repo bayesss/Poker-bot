@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FD947574-F557-4EF3-A6F6-5113355291B4}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{957155C7-4430-4F6F-B1A7-AAE63189F972}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TexasHoldem.GameSimulations</RootNamespace>
-    <AssemblyName>TexasHoldem.GameSimulations</AssemblyName>
+    <RootNamespace>TexasHoldem.AI.RandomPlayer</RootNamespace>
+    <AssemblyName>TexasHoldem.AI.RandomPlayer</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -29,9 +29,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,35 +39,16 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="TexasHoldem.Logic, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\TexasHoldemGameEngine.1.1.0\lib\TexasHoldem.Logic.dll</HintPath>
+      <HintPath>..\packages\TexasHoldemGameEngine.1.1.0\lib\TexasHoldem.Logic.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameSimulators\BaseGameSimulator.cs" />
-    <Compile Include="GameSimulators\BluffasaurusVsAllInPlayer.cs" />
-    <Compile Include="GameSimulators\BluffasaurusVsRandomPlayer.cs" />
-    <Compile Include="GameSimulators\GameSimulationResult.cs" />
-    <Compile Include="GameSimulators\IGameSimulator.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="RandomPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\AI\TexasHoldem.AI.Bluffasaurus\TexasHoldem.AI.Bluffasaurus.csproj">
-      <Project>{2dc4c6a0-3f09-4cbe-aaa2-76c6b7b08081}</Project>
-      <Name>TexasHoldem.AI.Bluffasaurus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\TexasHoldem.AI.AllInPlayer\TexasHoldem.AI.AllInPlayer.csproj">
-      <Project>{ea287442-8932-4ced-813d-b232b99cf17b}</Project>
-      <Name>TexasHoldem.AI.AllInPlayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\TexasHoldem.AI.RandomPlayer\TexasHoldem.AI.RandomPlayer.csproj">
-      <Project>{957155c7-4430-4f6f-b1a7-aae63189f972}</Project>
-      <Name>TexasHoldem.AI.RandomPlayer</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

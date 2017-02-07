@@ -1,7 +1,7 @@
 ﻿namespace TexasHoldem.Tests.GameSimulations
 {
     using System;
-
+    using TexasHoldem.GameSimulations.GameSimulators;
     using TexasHoldem.Tests.GameSimulations.GameSimulators;
 
     public static class Program
@@ -9,8 +9,7 @@
         public static void Main()
         {
             SimulateGames(new BluffasaurusVsAllInPlayer());
-            //SimulateGames(new BluffasaurusVsAlwaysRaisePlayerSimulator());
-            //SimulateGames(new BluffasaurusVsNotASmartPlayerSimulator());
+            SimulateGames(new BluffasaurusVsRandomPlayer());
         }
 
         private static void SimulateGames(IGameSimulator gameSimulator)

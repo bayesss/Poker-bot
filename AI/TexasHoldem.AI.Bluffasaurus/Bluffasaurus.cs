@@ -27,7 +27,7 @@
             if (context.RoundType == GameRoundType.PreFlop)
             {
                 var handValue = HandStrengthValuationBluffasaurus.PreFlop(this.FirstCard, this.SecondCard);
-                var optimalValueCoeff = 2;
+                var optimalValueCoeff = 3;
 
                 var extreme = 64 - optimalValueCoeff;
                 var powerful = 60 - optimalValueCoeff;
