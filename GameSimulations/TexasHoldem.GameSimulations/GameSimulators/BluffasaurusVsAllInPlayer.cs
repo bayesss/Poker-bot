@@ -3,6 +3,7 @@
     using Logic.Players;
     using AI.Bluffasaurus;
     using AI.AllInPlayer;
+
     public class BluffasaurusVsAllInPlayer : BaseGameSimulator
     {
         private readonly IPlayer firstPlayer = new Bluffasaurus();

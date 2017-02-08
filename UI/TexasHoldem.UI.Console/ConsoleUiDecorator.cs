@@ -17,12 +17,15 @@
 
         private readonly int commonRow;
 
-        public ConsoleUiDecorator(IPlayer player, int row, int width, int commonRow)
+        private bool showCards;
+
+        public ConsoleUiDecorator(IPlayer player, int row, int width, int commonRow, bool showCards = true)
             : base(player)
         {
             this.row = row;
             this.width = width;
             this.commonRow = commonRow;
+            this.showCards = showCards;
 
             this.DrawGameBox();
         }
@@ -38,8 +41,11 @@
             ConsoleHelper.WriteOnConsole(this.row + 3, 2, "                            ");
 
             ConsoleHelper.WriteOnConsole(this.row + 1, 2, context.MoneyLeft.ToString());
-            this.DrawSingleCard(this.row + 1, 10, context.FirstCard);
-            this.DrawSingleCard(this.row + 1, 14, context.SecondCard);
+            if (showCards)
+            {
+                this.DrawSingleCard(this.row + 1, 10, context.FirstCard);
+                this.DrawSingleCard(this.row + 1, 14, context.SecondCard);
+            }
 
             base.StartHand(context);
         }

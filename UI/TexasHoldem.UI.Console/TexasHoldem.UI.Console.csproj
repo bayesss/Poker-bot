@@ -65,6 +65,10 @@
       <Project>{fd947574-f557-4ef3-a6f6-5113355291b4}</Project>
       <Name>TexasHoldem.GameSimulations</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\TexasHoldem.AI.SmartBot\TexasHoldem.AI.SmartBot.csproj">
+      <Project>{d32e6baf-d06f-43a0-9955-4f1d3c827477}</Project>
+      <Name>TexasHoldem.AI.SmartBot</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

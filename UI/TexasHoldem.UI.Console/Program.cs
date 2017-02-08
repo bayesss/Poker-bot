@@ -3,7 +3,7 @@
     using System;
     using Logic.GameMechanics;
     using AI.Bluffasaurus;
-
+    using AI.SmartBot;
     public static class Program
     {
         private const string ProgramName = "TexasHoldem.UI.Console (c) 2015";
@@ -20,7 +20,7 @@
             ConsoleHelper.WriteOnConsole(GameHeight - 1, GameWidth - ProgramName.Length - 1, ProgramName, ConsoleColor.Green);
 
             var consolePlayer1 = new ConsoleUiDecorator(new ConsolePlayer(0), 0, GameWidth, 5);
-            var consolePlayer2 = new ConsoleUiDecorator(new Bluffasaurus(), 6, GameWidth, 5);
+            var consolePlayer2 = new ConsoleUiDecorator(new SmartBot(), 6, GameWidth, 5);
             ITexasHoldemGame game = new TwoPlayersTexasHoldemGame(consolePlayer1, consolePlayer2);
             game.Start();
         }
