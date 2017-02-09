@@ -37,7 +37,7 @@
                 inPosition = true;
 
                 // we are first to act on a small blind - we are not in position so we want to play around 70% of the cards and only raise around 40%
-                if (context.MoneyToCall == context.SmallBlind && context.CurrentPot == context.SmallBlind * 3)
+                if (context.MyMoneyInTheRound == context.SmallBlind)
                 {
                     inPosition = false;
 
@@ -66,7 +66,7 @@
                         return this.Fold();
                     }
                 }
-                else  // we are on big blind or opp has raised
+                else if (context.MyMoneyInTheRound == bigBlind && context.CurrentPot == context.SmallBlind * 3)  // we are to act on big blind
                 {
                     // we are in position and opp has not raised on small blind (probably hasn't a great hand) - we should make him fold most of his hands and if he calls we must be able to defend
                     if (context.MoneyToCall == 0)
@@ -92,99 +92,119 @@
                             return PlayerAction.CheckOrCall();
                         }
                     }
-                    else // opponent has raised
+                    else // opp has raised out of position - we can three bet him TODO: check if this logic can be combined with below else
                     {
-                        //// opp has raised out of position - we can three bet him
-                        //if (inPosition)
-                        //{
-                        //    if (handValue >= extreme)
-                        //    {
-                        //        return PlayerAction.Raise(bigBlind * 8);
-                        //    }
-                        //    else if (handValue >= powerful)
-                        //    {
-                        //        return PlayerAction.Raise(bigBlind * 6);
-                        //    }
-                        //    else if (handValue >= normal)
-                        //    {
-                        //        return PlayerAction.Raise(bigBlind * 4);
-                        //    }
-                        //    else if (handValue >= weak && bigBlind < context.MoneyLeft / (double)50) // we dont have a great hand either but we can make him sweat about it and we can always fold later
-                        //    {
-                        //        return PlayerAction.Raise(bigBlind * 2);
-                        //    }
-                        //    else if (handValue >= awful) // that makes around 74% of all possible hands
-                        //    {
-                        //        return PlayerAction.CheckOrCall();
-                        //    }
-                        //}
-                        //else if (context.MyMoneyInTheRound == bigBlind) // opp has raised in position
-                        //{
-
-                        //}
-                        //else // opp has reraised us
-                        //{
-
-                        //}
-
-                        // a lot(has a strong hand)
-                        if (context.MoneyToCall > context.SmallBlind * 8 && context.MoneyToCall > 40)
+                        // opp has raised a lot - we should call him or raise only on our best cards
+                        if (context.MoneyToCall >= bigBlind * 8 && context.MoneyToCall >= context.MoneyLeft / (double)25)
                         {
-                            if (handValue >= extreme) // cards like AA, KK, AKs
+                            if (handValue >= extreme)
                             {
-                                return PlayerAction.Raise(context.SmallBlind * 16);
+                                return PlayerAction.Raise(context.MoneyToCall);
                             }
                             else if (handValue >= powerful)
                             {
-                                // we have some more money and want to wait for a better shot
-                                if (context.MoneyToCall > context.MoneyLeft / 4 && context.MoneyToCall > context.SmallBlind * 6)
-                                {
-                                    return this.Fold();
-                                }
-                                else
-                                {
-                                    return PlayerAction.CheckOrCall();
-                                }
+                                return PlayerAction.CheckOrCall();
                             }
-                            else
+                            else // TODO: here we could open more hands if we know that our opp raises a lot on cheap hands
                             {
-                                return this.Fold();
+                                return PlayerAction.Fold();
                             }
                         }
-                        else // opponent has not raised a lot
+                        else if (context.MoneyToCall >= bigBlind * 4)
                         {
-                            if (handValue >= extreme) // cards like AA, KK, AKs
+                            if (handValue >= powerful)
                             {
-                                return PlayerAction.Raise(context.SmallBlind * 20);
-                            }
-                            else if (handValue >= powerful)
-                            {
-                                // if we have already raised enough this round
-                                if (context.MyMoneyInTheRound > context.SmallBlind * 10)
-                                {
-                                    return PlayerAction.CheckOrCall();
-                                }
-                                else
-                                {
-                                    return PlayerAction.Raise(context.SmallBlind * 12);
-                                }
+                                return PlayerAction.Raise(context.MoneyToCall);
                             }
                             else if (handValue >= normal)
                             {
                                 return PlayerAction.CheckOrCall();
                             }
-                            else if (handValue >= weak && (context.MoneyToCall <= 20 || context.MoneyToCall <= context.SmallBlind * 3))
+                            else if (handValue >= weak && context.MoneyToCall < context.MoneyLeft / (double)30) // we dont have a great hand either but we can make him sweat about it and we can always fold later
                             {
                                 return PlayerAction.CheckOrCall();
                             }
-                            else if (handValue >= awful && (context.MoneyToCall <= 20 || context.MoneyToCall <= context.SmallBlind * 2))
+                            else // that makes around 74% of all possible hands
+                            {
+                                return PlayerAction.Fold();
+                            }
+                        }
+                        else // opp raised with less than 4 big blinds
+                        {
+                            if (handValue >= normal)
+                            {
+                                return PlayerAction.Raise((int)(context.MoneyToCall * 2.5));
+                            }
+                            else if (handValue >= weak && bigBlind < context.MoneyLeft / (double)30) // we dont have a great hand either but we can make him sweat about it and we can always fold later
+                            {
+                                return PlayerAction.CheckOrCall();
+                            }
+                            else if (handValue >= awful && context.MoneyToCall < bigBlind * 2) // that makes around 74% of all possible hands
                             {
                                 return PlayerAction.CheckOrCall();
                             }
                             else
                             {
-                                return this.Fold();
+                                return PlayerAction.Fold();
                             }
+                        }
+                    }
+                }
+                else // opp reraises us or we have checked on SB and he has raised
+                {
+                    if (handValue >= extreme)
+                    {
+                        return PlayerAction.CheckOrCall();
+                    }
+
+                    // opp has raised a lot - we should call him or raise only on our best cards
+                    if (context.MoneyToCall >= bigBlind * 8 && context.MoneyToCall >= context.MoneyLeft / (double)25)
+                    {
+                        if (handValue >= powerful)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else if (handValue >= normal && context.MyMoneyInTheRound > context.MoneyToCall * 2) // TODO: here we could open more hands if we know that our opp raises a lot on cheap hands
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else
+                        {
+                            return PlayerAction.Fold();
+                        }
+                    }
+                    else if (context.MoneyToCall >= bigBlind * 4)
+                    {
+                        if (handValue >= normal)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else if (handValue >= weak && context.MyMoneyInTheRound > context.MoneyToCall * 2)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else // that makes around 74% of all possible hands
+                        {
+                            return PlayerAction.Fold();
+                        }
+                    }
+                    else // opp raised with less than 4 big blinds
+                    {
+                        if (handValue >= normal)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else if (handValue >= weak && context.MyMoneyInTheRound > context.MoneyToCall * 2)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else if (handValue >= awful && context.MoneyToCall < bigBlind * 2) // that makes around 74% of all possible hands
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else
+                        {
+                            return PlayerAction.Fold();
                         }
                     }
                 }
