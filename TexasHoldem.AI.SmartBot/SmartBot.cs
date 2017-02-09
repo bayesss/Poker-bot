@@ -214,8 +214,6 @@
             #region Flop
             else if (context.RoundType == GameRoundType.Flop)
             {
-                var raiseCoeff = context.SmallBlind * 0;
-
                 if (context.MoneyLeft == 0)
                 {
                     return PlayerAction.CheckOrCall();
@@ -224,29 +222,31 @@
                 var flopCardStrength = CardsStrengthEvaluation.RateCards
                     (new List<Card> { FirstCard, SecondCard, CommunityCards.ElementAt(0), CommunityCards.ElementAt(1), CommunityCards.ElementAt(2) });
 
-                if (inPosition)
+                // we are first to act out of position
+                if (context.MoneyToCall == 0 && !inPosition)
                 {
+                    // we are almost sure to win so we want to double the pot
                     if (flopCardStrength >= 2000)
                     {
-                        return PlayerAction.Raise(context.SmallBlind * 8 + raiseCoeff);
+                        return PlayerAction.Raise(Math.Max(context.CurrentPot, bigBlind * 6));
                     }
                     else if (flopCardStrength >= 1000)
                     {
-                        var pairInfo = this.GetPairInfo();
+                        var pairValue = this.GetPairValue();
 
-                        if (pairInfo == 0)
+                        if (pairValue == 0)
                         {
                             return PlayerAction.CheckOrCall();
                         }
                         else
                         {
-                            if (pairInfo >= 11)
+                            if (this.IsHighestPair(pairValue)) // we have the highest pair possible
                             {
-                                return PlayerAction.Raise(context.SmallBlind * 12 + raiseCoeff);
+                                return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 4));
                             }
                             else
                             {
-                                return PlayerAction.Raise(context.SmallBlind * 8 + raiseCoeff);
+                                return PlayerAction.Raise(Math.Max(context.CurrentPot / 3, bigBlind * 2));
                             }
                         }
                     }
@@ -255,107 +255,225 @@
                         return PlayerAction.CheckOrCall();
                     }
                 }
-                else
+                else if (context.MyMoneyInTheRound == 0 && inPosition) // we are to act in position
                 {
-                    // opponent has raised
-                    if (context.MoneyToCall > 0)
-                    {
-                        // a lot
-                        if (context.MoneyToCall > context.CurrentPot - context.MoneyToCall && context.MoneyToCall > 50)
-                        {
-                            if (flopCardStrength >= 3000)
-                            {
-                                return PlayerAction.Raise(context.SmallBlind * 30 + raiseCoeff);
-                            }
-                            if (flopCardStrength >= 2000)
-                            {
-                                return PlayerAction.Raise(context.SmallBlind * 10 + raiseCoeff);
-                            }
-                            else if (flopCardStrength >= 1000)
-                            {
-                                // is common pair logic
-                                var pairInfo = this.GetPairInfo();
-
-                                if (pairInfo == 0)
-                                {
-                                    return this.Fold();
-                                }
-                                else
-                                {
-                                    // money are a lot and we fold
-                                    if (context.MoneyToCall > context.MoneyLeft / 3 && context.MoneyLeft > 300)
-                                    {
-                                        return this.Fold();
-                                    }
-                                    else
-                                    {
-                                        if (pairInfo >= 11)
-                                        {
-                                            return PlayerAction.CheckOrCall();
-                                        }
-                                        else
-                                        {
-                                            return this.Fold();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                return this.Fold();
-                            }
-                        }
-                        else //not a lot
-                        {
-                            if (flopCardStrength >= 2000)
-                            {
-                                return PlayerAction.Raise(context.SmallBlind * 8 + raiseCoeff);
-                            }
-                            else if (flopCardStrength >= 1000)
-                            {
-                                var pairInfo = this.GetPairInfo();
-
-                                if (pairInfo == 0)
-                                {
-                                    return PlayerAction.CheckOrCall();
-                                }
-                                else
-                                {
-                                    if (pairInfo >= 11)
-                                    {
-                                        return PlayerAction.Raise(context.SmallBlind * 8 + raiseCoeff);
-                                    }
-                                    else
-                                    {
-                                        return PlayerAction.CheckOrCall();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (context.MoneyToCall >= 20)
-                                {
-                                    return this.Fold();
-                                }
-                                else
-                                {
-                                    return PlayerAction.CheckOrCall();
-                                }
-                            }
-                        }
-                    }
-                    else // opp has checked (has bad hand)
+                    if (context.MoneyToCall == 0) // opp has checked
                     {
                         if (flopCardStrength >= 2000)
                         {
-                            return PlayerAction.Raise(context.SmallBlind * 8 + raiseCoeff);
+                            return PlayerAction.Raise(Math.Max(context.CurrentPot * 2, bigBlind * 8));
                         }
                         else if (flopCardStrength >= 1000)
                         {
-                            return PlayerAction.Raise(context.SmallBlind * 16 + raiseCoeff);
+                            var pairValue = this.GetPairValue();
+
+                            if (pairValue != 0)
+                            {
+                                if (this.IsHighestPair(pairValue)) // we have the highest pair possible
+                                {
+                                    return PlayerAction.Raise(Math.Max(context.CurrentPot * 2, bigBlind * 6));
+                                }
+                                else
+                                {
+                                    return PlayerAction.Raise(Math.Max(context.CurrentPot, bigBlind * 4));
+                                }
+                            }
                         }
 
+                        // we have nothing or pair is in community cards
+                        if (this.HaveHighestKicker())
+                        {
+                            return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 2));
+                        }
+                        else
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                    }
+                }
+
+                // opp has raised
+
+                // an awful lot
+                if (context.MoneyToCall >= (context.CurrentPot - context.MoneyToCall) * 2 && context.MoneyToCall > 100)
+                {
+                    if (flopCardStrength >= 4000)
+                    {
+                        return PlayerAction.Raise(context.MoneyToCall);
+                    }
+                    else if (flopCardStrength >= 3000)
+                    {
+                        // TODO: 3of a kind logic
+                        var threeOfAKindWeHave = this.HowManyOfThreeOfAKindWeHave();
+                        if (threeOfAKindWeHave == 2)
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall);
+                        }
+                        else if (threeOfAKindWeHave == 1 || this.HaveHighestKicker())
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else
+                        {
+                            return PlayerAction.Fold();
+                        }
+                    }
+                    if (flopCardStrength >= 2000)
+                    {
+                        if (!this.IsPairInCommunity())
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall);
+                        }
+                        else
+                        {
+                            if (this.HaveHighestKicker())
+                            {
+                                return PlayerAction.CheckOrCall();
+                            }
+                            else
+                            {
+                                return PlayerAction.Fold();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return this.Fold();
+                    }
+                }
+                else if (context.MoneyToCall > (context.CurrentPot - context.MoneyToCall) && context.MoneyToCall > 60) // opp has raised a reasonable amout
+                {
+                    if (flopCardStrength >= 4000)
+                    {
+                        return PlayerAction.Raise(context.CurrentPot);
+                    }
+                    else if (flopCardStrength >= 3000)
+                    {
+                        // TODO: 3of a kind logic
+                        var threeOfAKindWeHave = this.HowManyOfThreeOfAKindWeHave();
+                        if (threeOfAKindWeHave == 2)
+                        {
+                            return PlayerAction.Raise(context.CurrentPot);
+                        }
+                        else if (threeOfAKindWeHave == 1)
+                        {
+                            return PlayerAction.Raise(context.CurrentPot / 2);
+                        }
+                        else if (this.HaveHighestKicker())
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else
+                        {
+                            return PlayerAction.Fold();
+                        }
+                    }
+                    else if (flopCardStrength >= 2000)
+                    {
+                        if (!this.IsPairInCommunity())
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall);
+                        }
+                        else
+                        {
+                            var pairValue = this.GetPairValue();
+
+                            if (this.IsHighestPair(pairValue))
+                            {
+                                return PlayerAction.Raise(context.MoneyToCall);
+                            }
+                            else
+                            {
+                                return PlayerAction.CheckOrCall();
+                            }
+                        }
+                    }
+                    else if (flopCardStrength >= 1000)
+                    {
+                        var pairValue = this.GetPairValue();
+
+                        if (pairValue == 0)
+                        {
+                            return this.Fold();
+                        }
+
+                        if (this.IsHighestPair(pairValue) || this.HaveHighestKicker())
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                    }
+
+                    return this.Fold();
+                }
+                else // opp has raised a little
+                {
+                    if (flopCardStrength >= 4000)
+                    {
+                        return PlayerAction.Raise(context.MoneyToCall * 2);
+                    }
+                    else if (flopCardStrength >= 3000)
+                    {
+                        // TODO: 3of a kind logic
+                        var threeOfAKindWeHave = this.HowManyOfThreeOfAKindWeHave();
+                        if (threeOfAKindWeHave == 2)
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall * 2);
+                        }
+                        else if (threeOfAKindWeHave == 1)
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall);
+                        }
+                        else if (this.HaveHighestKicker())
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall);
+                        }
+                        else
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                    }
+                    else if (flopCardStrength >= 2000)
+                    {
+                        if (!this.IsPairInCommunity())
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall * 2);
+                        }
+                        else
+                        {
+                            var pairValue = this.GetPairValue();
+
+                            if (this.IsHighestPair(pairValue))
+                            {
+                                return PlayerAction.Raise(context.MoneyToCall);
+                            }
+                            else
+                            {
+                                return PlayerAction.CheckOrCall();
+                            }
+                        }
+                    }
+                    else if (flopCardStrength >= 1000)
+                    {
+                        var pairValue = this.GetPairValue();
+
+                        if (pairValue == 0)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+
+                        if (this.IsHighestPair(pairValue) || this.HaveHighestKicker())
+                        {
+                            return PlayerAction.Raise(context.MoneyToCall / 2);
+                        }
+                    }
+
+                    if (this.HaveHighestKicker())
+                    {
                         return PlayerAction.CheckOrCall();
+                    }
+                    else
+                    {
+                        return this.Fold();
                     }
                 }
             }
@@ -510,7 +628,7 @@
             return PlayerAction.CheckOrCall(); // It should never reach this point
         }
 
-        private int GetPairInfo()
+        private int GetPairValue()
         {
             if (this.FirstCard.Type == this.SecondCard.Type)
             {
@@ -531,6 +649,57 @@
             }
 
             return 0;
+        }
+
+        private bool IsHighestPair(int pairValue)
+        {
+            foreach (var card in this.CommunityCards)
+            {
+                if ((int)card.Type > pairValue)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool HaveHighestKicker()
+        {
+            var allCards = new List<Card>();
+            allCards.Add(this.FirstCard);
+            allCards.Add(this.SecondCard);
+            allCards.AddRange(this.CommunityCards);
+
+            var kickerGroup = allCards.GroupBy(x => x.Type).OrderByDescending(x => x.Key).Where(g => g.Count() == 1).FirstOrDefault();
+
+            if (kickerGroup != null)
+            {
+                var kickerCard = kickerGroup.First();
+                if (kickerCard == this.FirstCard || kickerCard == this.SecondCard)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsPairInCommunity()
+        {
+            var firstGroup = this.CommunityCards.GroupBy(x => x.Type).OrderByDescending(x => x.Count()).First();
+            return firstGroup.Count() > 1;
+        }
+
+        private int HowManyOfThreeOfAKindWeHave()
+        {
+            if (this.FirstCard.Type == this.SecondCard.Type)
+                return 2;
+
+            var threeOfAKindGroup = this.CommunityCards.GroupBy(x => x.Type).OrderByDescending(x => x.Count()).First();
+
+            if (threeOfAKindGroup.Count() == 3)
+                return 0;
+
+            return 1;
         }
     }
 }
