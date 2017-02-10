@@ -520,84 +520,94 @@
                 var flopCardStrength = CardsStrengthEvaluation.RateCards
                     (new List<Card> { FirstCard, SecondCard, CommunityCards.ElementAt(0), CommunityCards.ElementAt(1), CommunityCards.ElementAt(2) });
 
-                if (flopCardStrength >= 2000)
-                {
-                    return PlayerAction.Raise(context.CurrentPot);
-                }
-                else
-                {
-                    var hand = new List<Card>();
-                    hand.Add(this.FirstCard);
-                    hand.Add(this.SecondCard);
+                var hand = new List<Card>();
+                hand.Add(this.FirstCard);
+                hand.Add(this.SecondCard);
 
-                    var ehs = EffectiveHandStrenghtCalculator.CalculateEHS(hand, this.CommunityCards);
+                var ehs = EffectiveHandStrenghtCalculator.CalculateEHS(hand, this.CommunityCards);
 
+                // we are first to act out of position - we should always add a little bit of pressure on our opp
+                if (context.MoneyToCall == 0 && !inPosition)
+                {
                     if (ehs < 0.3)
                     {
-                        if (context.MoneyToCall <= context.MoneyLeft / 200)
+                        return PlayerAction.CheckOrCall();
+                    }
+                    if (ehs < 0.5)
+                    {
+                        if (this.HaveHighestKicker())
+                        {
+                            return PlayerAction.Raise(context.CurrentPot / 5);
+                        }
+                        else
                         {
                             return PlayerAction.CheckOrCall();
                         }
-                        else
-                        {
-                            return this.Fold();
-                        }
                     }
-                    else if (ehs < 0.5)
+                    else if (ehs < 0.63)
                     {
-                        if (context.MoneyToCall <= context.MoneyLeft / 40)
-                        {
-                            return PlayerAction.CheckOrCall();
-                        }
-                        else
-                        {
-                            return this.Fold();
-                        }
-                    }
-                    else if (ehs < 0.62)
-                    {
-                        var currentPot = context.CurrentPot;
-                        int moneyToBet = (int)(currentPot * 0.55);
-
-                        if (context.MoneyToCall == 0)
-                        {
-                            return PlayerAction.Raise(moneyToBet);
-                        }
-                        else if (context.MoneyToCall < context.MoneyLeft / 20 || context.MoneyToCall < 50)
-                        {
-                            if (context.MoneyToCall < moneyToBet && context.MyMoneyInTheRound == 0)
-                            {
-                                return PlayerAction.Raise(moneyToBet - context.MoneyToCall + 1);
-                            }
-                            else
-                            {
-                                return PlayerAction.CheckOrCall();
-                            }
-                        }
-                        else
-                        {
-                            return this.Fold();
-                        }
+                        return PlayerAction.Raise(context.CurrentPot / 4);
                     }
                     else if (ehs < 0.75)
                     {
-                        var currentPot = context.CurrentPot;
-                        int moneyToBet = (int)(currentPot * 0.75);
-
-                        if (context.MoneyToCall == 0)
+                        return PlayerAction.Raise(context.CurrentPot / 3);
+                    }
+                    else
+                    {
+                        return PlayerAction.Raise(context.CurrentPot / 2);
+                    }
+                }
+                else if (context.MyMoneyInTheRound == 0 && inPosition) // we are to act in position
+                {
+                    if (context.MoneyToCall == 0) // opp has checked
+                    {
+                        // he has nothing, but neither have we - we should try to bluff him most of the time, or atleast make him sweat for that money
+                        if (ehs < 0.5)
                         {
-                            return PlayerAction.Raise(moneyToBet);
-                        }
-                        else if (context.MoneyToCall < context.MoneyLeft / 10 || context.MoneyToCall < 70) // TODO:
-                        {
-                            if (context.MoneyToCall < moneyToBet && context.MyMoneyInTheRound == 0)
+                            // he has checked as first action previous round - he has nothing => we bluff
+                            if (context.PreviousRoundActions.Where(x => x.PlayerName != this.Name).FirstOrDefault().Action == PlayerAction.CheckOrCall())
                             {
-                                return PlayerAction.Raise(moneyToBet - context.MoneyToCall + 1);
+                                return PlayerAction.Raise(context.CurrentPot); // bluff - we are trying to make him fold
+                            }
+
+                            if (this.HaveHighestKicker())
+                            {
+                                return PlayerAction.Raise(context.CurrentPot / 2); // we are trying to make him fold
                             }
                             else
                             {
-                                return PlayerAction.CheckOrCall();
+                                return PlayerAction.Raise(context.CurrentPot / 5);
                             }
+                        }
+                        else if (ehs < 0.60)
+                        {
+                            return PlayerAction.Raise(context.CurrentPot / 4);
+                        }
+                        else if (ehs < 0.70)
+                        {
+                            return PlayerAction.Raise(context.CurrentPot / 2);
+                        }
+                        else
+                        {
+                            return PlayerAction.Raise(context.CurrentPot / 3);
+                        }
+                    }
+                }
+
+                // opp has raised
+
+                // an awful lot
+                if (context.MoneyToCall >= (context.CurrentPot - context.MoneyToCall))
+                {
+                    if (ehs < 0.60)
+                    {
+                        return this.Fold();
+                    }
+                    else if (ehs < 0.70)
+                    {
+                        if (context.MoneyToCall < context.MoneyLeft / 10 || context.MoneyToCall < 70)
+                        {
+                            return PlayerAction.CheckOrCall();
                         }
                         else
                         {
@@ -606,20 +616,9 @@
                     }
                     else if (ehs < 0.85)
                     {
-                        var currentPot = context.CurrentPot;
-                        int moneyToBet = (int)(currentPot * 0.85);
+                        int moneyToBet = (int)(context.CurrentPot * 0.85);
 
-                        if (context.MoneyToCall == 0)
-                        {
-
-                            if (moneyToBet < 50)
-                            {
-                                moneyToBet = 50;
-                            }
-
-                            return PlayerAction.Raise(moneyToBet);
-                        }
-                        else if (context.MoneyToCall < context.MoneyLeft / 2 || context.MoneyToCall < 250)
+                        if (context.MoneyToCall < context.MoneyLeft / 2 || context.MoneyToCall < 250)
                         {
                             if (context.MoneyToCall < moneyToBet && context.MyMoneyInTheRound == 0)
                             {
@@ -637,14 +636,95 @@
                     }
                     else
                     {
-                        var currentPot = context.CurrentPot;
-                        int moneyToBet = currentPot;
-                        if (moneyToBet < 80)
+                        return PlayerAction.Raise(context.MoneyToCall);
+                    }
+                }
+                else if (context.MoneyToCall > (context.CurrentPot - context.MoneyToCall) / 2) // opp has raised a reasonable amout
+                {
+                    if (ehs < 0.50)
+                    {
+                        return this.Fold();
+                    }
+                    else if (ehs < 0.60)
+                    {
+                        if (context.MoneyToCall < context.MoneyLeft / 10 || context.MoneyToCall < 70)
                         {
-                            moneyToBet = 80;
+                            return PlayerAction.CheckOrCall();
                         }
+                        else
+                        {
+                            return this.Fold();
+                        }
+                    }
+                    else if (ehs < 0.75)
+                    {
+                        int moneyToBet = (int)(context.CurrentPot * 0.75);
 
-                        return PlayerAction.Raise(moneyToBet);
+                        if (context.MoneyToCall < context.MoneyLeft / 2 || context.MoneyToCall < 250)
+                        {
+                            if (context.MoneyToCall < moneyToBet && context.MyMoneyInTheRound == 0)
+                            {
+                                return PlayerAction.Raise(moneyToBet - context.MoneyToCall + 1);
+                            }
+                            else
+                            {
+                                return PlayerAction.CheckOrCall();
+                            }
+                        }
+                        else
+                        {
+                            return this.Fold();
+                        }
+                    }
+                    else
+                    {
+                        return PlayerAction.Raise(context.MoneyToCall);
+                    }
+                }
+                else // opp has raised a little
+                {
+                    if (ehs < 0.40)
+                    {
+                        return this.Fold();
+                    }
+                    else if (ehs < 0.50)
+                    {
+                        return PlayerAction.CheckOrCall();
+                    }
+                    else if (ehs < 0.60)
+                    {
+                        if (context.MoneyToCall < context.MoneyLeft / 10 || context.MoneyToCall < 70)
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                        else
+                        {
+                            return this.Fold();
+                        }
+                    }
+                    else if (ehs < 0.75)
+                    {
+                        int moneyToBet = (int)(context.CurrentPot * 0.85);
+
+                        if (context.MoneyToCall < context.MoneyLeft / 2 || context.MoneyToCall < 250)
+                        {
+                            if (context.MoneyToCall < moneyToBet && context.MyMoneyInTheRound == 0)
+                            {
+                                return PlayerAction.Raise(moneyToBet - context.MoneyToCall + 1);
+                            }
+                            else
+                            {
+                                return PlayerAction.CheckOrCall();
+                            }
+                        }
+                        else
+                        {
+                            return this.Fold();
+                        }
+                    }
+                    else
+                    {
+                        return PlayerAction.Raise(context.CurrentPot / 2);
                     }
                 }
             }
