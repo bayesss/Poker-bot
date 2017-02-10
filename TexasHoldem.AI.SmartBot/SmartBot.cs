@@ -225,10 +225,40 @@
                 // we are first to act out of position
                 if (context.MoneyToCall == 0 && !inPosition)
                 {
-                    // we are almost sure to win so we want to double the pot
+                    if (flopCardStrength >= 4000)
+                    {
+                        return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 4)); // we are 100% sure to win so we want to keep him in the game as long as possible
+                    }
+                    else if (flopCardStrength >= 3000)
+                    {
+                        // TODO: 3of a kind logic
+                        var threeOfAKindWeHave = this.HowManyOfThreeOfAKindWeHave();
+                        if (threeOfAKindWeHave == 2)
+                        {
+                            return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 4));
+                        }
+                        else
+                        {
+                            return PlayerAction.CheckOrCall();
+                        }
+                    }
                     if (flopCardStrength >= 2000)
                     {
-                        return PlayerAction.Raise(Math.Max(context.CurrentPot, bigBlind * 6));
+                        if (!this.IsPairInCommunity())
+                        {
+                            return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 4));
+                        }
+                        else
+                        {
+                            if (this.HaveHighestKicker())
+                            {
+                                return PlayerAction.Raise(Math.Max(context.CurrentPot / 3, bigBlind * 3));
+                            }
+                            else
+                            {
+                                return PlayerAction.Raise(Math.Max(context.CurrentPot / 4, bigBlind * 2));
+                            }
+                        }
                     }
                     else if (flopCardStrength >= 1000)
                     {
@@ -246,7 +276,7 @@
                             }
                             else
                             {
-                                return PlayerAction.Raise(Math.Max(context.CurrentPot / 3, bigBlind * 2));
+                                return PlayerAction.Raise(Math.Max(context.CurrentPot / 3, bigBlind * 3));
                             }
                         }
                     }
@@ -261,7 +291,7 @@
                     {
                         if (flopCardStrength >= 2000)
                         {
-                            return PlayerAction.Raise(Math.Max(context.CurrentPot * 2, bigBlind * 8));
+                            return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 4));
                         }
                         else if (flopCardStrength >= 1000)
                         {
@@ -271,11 +301,11 @@
                             {
                                 if (this.IsHighestPair(pairValue)) // we have the highest pair possible
                                 {
-                                    return PlayerAction.Raise(Math.Max(context.CurrentPot * 2, bigBlind * 6));
+                                    return PlayerAction.Raise(Math.Max(context.CurrentPot, bigBlind * 8));
                                 }
                                 else
                                 {
-                                    return PlayerAction.Raise(Math.Max(context.CurrentPot, bigBlind * 4));
+                                    return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 4));
                                 }
                             }
                         }
@@ -283,7 +313,7 @@
                         // we have nothing or pair is in community cards
                         if (this.HaveHighestKicker())
                         {
-                            return PlayerAction.Raise(Math.Max(context.CurrentPot / 2, bigBlind * 2));
+                            return PlayerAction.Raise(Math.Max(context.CurrentPot / 4, bigBlind * 2));
                         }
                         else
                         {
@@ -295,7 +325,7 @@
                 // opp has raised
 
                 // an awful lot
-                if (context.MoneyToCall >= (context.CurrentPot - context.MoneyToCall) * 2 && context.MoneyToCall > 100)
+                if (context.MoneyToCall >= (context.CurrentPot - context.MoneyToCall) && context.MoneyToCall >= 60)
                 {
                     if (flopCardStrength >= 4000)
                     {
@@ -341,7 +371,7 @@
                         return this.Fold();
                     }
                 }
-                else if (context.MoneyToCall > (context.CurrentPot - context.MoneyToCall) && context.MoneyToCall > 60) // opp has raised a reasonable amout
+                else if (context.MoneyToCall > (context.CurrentPot - context.MoneyToCall) / 2 && context.MoneyToCall >= 40) // opp has raised a reasonable amout
                 {
                     if (flopCardStrength >= 4000)
                     {
@@ -482,11 +512,6 @@
             #region Turn
             else if (context.RoundType == GameRoundType.Turn || context.RoundType == GameRoundType.River)
             {
-                if (context.RoundType == GameRoundType.River)
-                {
-                    inPosition = false;
-                }
-
                 if (context.MoneyLeft == 0)
                 {
                     return PlayerAction.CheckOrCall();
